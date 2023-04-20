@@ -1,0 +1,40 @@
+# Save the output of this file and use kubectl create -f to import
+# it into Kubernetes.
+#
+# Created with podman-4.5.0
+
+# NOTE: If you generated this yaml from an unprivileged and rootless podman container on an SELinux
+# enabled system, check the podman generate kube man page for steps to follow to ensure that your pod/container
+# has the right permissions to access the volumes added.
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    io.podman.annotations.ulimit: nofile=1048576:1048576,nproc=256546:256546
+  creationTimestamp: "2023-04-20T09:13:30Z"
+  labels:
+    app: portainer-pod
+  name: portainer-pod
+spec:
+  containers:
+  - image: docker.io/portainer/portainer-ce:latest
+    name: portainer
+    ports:
+    - containerPort: 8000
+      hostPort: 8000
+    - containerPort: 9000
+      hostPort: 9000
+    volumeMounts:
+    - mountPath: /var/run/docker.sock
+      name: var-run-docker.sock-host-0
+    - mountPath: /data
+      name: portainer_data-pvc
+  volumes:
+  - hostPath:
+      path: /var/run/docker.sock
+      type: File
+    name: var-run-docker.sock-host-0
+  - name: portainer_data-pvc
+    persistentVolumeClaim:
+      claimName: portainer_data
